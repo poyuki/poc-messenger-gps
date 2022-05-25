@@ -1,0 +1,34 @@
+framework:
+  messenger:
+    serializer:
+      default_serializer: messenger.transport.symfony_serializer
+      symfony_serializer:
+        format: json
+        context: { }
+    transports:
+      # https://symfony.com/doc/current/messenger.html#transport-configuration
+      # async: '%env(MESSENGER_TRANSPORT_DSN)%'
+      # failed: 'doctrine://default?queue_name=failed'
+      sync: 'sync://'
+      gps_transport:
+        dsn: 'gps://default'
+        options:
+          client_config: # optional (default: [])
+            apiEndpoint: 'https://europe-west3-pubsub.googleapis.com'
+          max_messages_pull: 10 # optional (default: 10)
+          topic: # optional (default name: messages)
+            name: 'topic'
+          queue: # optional (default the same as topic.name)
+            name: 'subscription'
+        retry_strategy:
+          max_retries: 3
+          # milliseconds delay
+          delay: 1000
+          # causes the delay to be higher before each retry
+          # e.g. 1 second delay, 2 seconds, 4 seconds
+          multiplier: 2
+          max_delay: 0
+
+    routing:
+      # Route your messages to the transports
+      'App\Infrastructure\Messenger\Message\Test': gps_transport
