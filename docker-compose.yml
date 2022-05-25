@@ -1,0 +1,30 @@
+version: "3.7"
+
+services:
+  poc_worker:
+    container_name: poc_worker
+    build:
+      context: .
+    environment:
+      - 'XDEBUG_MODE=debug'
+      - 'XDEBUG_CONFIG=idekey=poc_worker client_host=host.docker.internal'
+      - 'XDEBUG_TRIGGER=1'
+    expose:
+      - 9001
+    networks:
+      poc_network:
+        aliases:
+          - poc_worker.docker.localhost
+    volumes:
+      - .:/var/www/html:cached
+      - ./docker/supervisor.conf:/etc/supervisor/conf.d/supervisord.conf
+    working_dir: /var/www/html
+
+volumes:
+  poc_worker:
+    driver: local
+
+
+networks:
+  poc_network:
+    driver: bridge
